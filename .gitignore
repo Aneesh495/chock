@@ -1,0 +1,46 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C / C++ / Build artifacts
+*.o
+*.obj
+*.so
+*.dylib
+*.a
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# P4 compilation outputs
+*.bmv2/
+*.json
+*.p4i
+*.p4rt.txt
+*.p4rt.bin
+!p4info*.json
+
+# Test and coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+*.pcap
+!examples/*.pcap
+!tests/fixtures/*.pcap
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
