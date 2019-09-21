@@ -81,6 +81,18 @@ class P4Parser:
                 self.advance()
         return program
 
+    def parse_type(self) -> TypeNode:
+        type_str = self.advance().value
+        width = None
+        if self.match(TokenType.LT):
+            param_tokens = []
+            while not self.match(TokenType.GT) and self.peek().type != TokenType.EOF:
+                param_tokens.append(self.advance().value)
+            type_str += "<" + "".join(param_tokens) + ">"
+            if len(param_tokens) == 1 and param_tokens[0].isdigit():
+                width = int(param_tokens[0])
+        return TypeNode(name=type_str, width=width)
+
     def parse_header(self) -> Optional[HeaderNode]:
         self.match(TokenType.HEADER)
         name = self.advance().value
@@ -88,10 +100,10 @@ class P4Parser:
         if not self.match(TokenType.LBRACE):
             return hdr
         while self.peek().type != TokenType.RBRACE and self.peek().type != TokenType.EOF:
-            type_str = self.advance().value
+            type_node = self.parse_type()
             f_name = self.advance().value
             self.match(TokenType.SEMICOLON)
-            hdr.fields.append(FieldNode(name=f_name, type_node=TypeNode(name=type_str)))
+            hdr.fields.append(FieldNode(name=f_name, type_node=type_node))
         self.match(TokenType.RBRACE)
         return hdr
 
@@ -102,10 +114,10 @@ class P4Parser:
         if not self.match(TokenType.LBRACE):
             return st
         while self.peek().type != TokenType.RBRACE and self.peek().type != TokenType.EOF:
-            type_str = self.advance().value
+            type_node = self.parse_type()
             f_name = self.advance().value
             self.match(TokenType.SEMICOLON)
-            st.fields.append(FieldNode(name=f_name, type_node=TypeNode(name=type_str)))
+            st.fields.append(FieldNode(name=f_name, type_node=type_node))
         self.match(TokenType.RBRACE)
         return st
 

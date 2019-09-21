@@ -301,7 +301,9 @@ class P4Lexer:
                     parts = num_str.split("#")
                     w = int(parts[0])
                     v_str = parts[1]
-                    val = int(v_str, 16) if any(h in v_str.lower() for h in "abcdef") else int(v_str, 10)
+                    # In P4, if width corresponds to nibble count (e.g. 16#0800, 48#00aabbcc) or contains hex digits
+                    is_hex = any(h in v_str.lower() for h in "abcdef") or (len(v_str) * 4 == w and len(v_str) > 1) or (w == 16 and len(v_str) == 4)
+                    val = int(v_str, 16) if is_hex else int(v_str, 10)
                     tokens.append(Token(TokenType.BIT_LITERAL, num_str, start_line, start_col, width=w, numeric_value=val))
                 elif num_str.startswith("0x") or num_str.startswith("0X"):
                     tokens.append(Token(TokenType.HEX_LITERAL, num_str, start_line, start_col, numeric_value=int(num_str, 16)))
