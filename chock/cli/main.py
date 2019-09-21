@@ -108,11 +108,25 @@ def cmd_bench(args):
     print(f"  Throughput:        {rate:,.0f} packets/sec ({rate/1e6:.2f} Mpps)")
     print(f"  Average Latency:   {avg_ns:.1f} ns per packet")
 
+def cmd_test(args):
+    """Executes the full unit and integration test suite."""
+    import unittest
+    repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    tests_dir = os.path.join(repo_root, "tests")
+    print(f"Discovering and running tests in {tests_dir}...\n")
+    loader = unittest.TestLoader()
+    suite = loader.discover(start_dir=tests_dir, top_level_dir=repo_root)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    if not result.wasSuccessful():
+        sys.exit(1)
+
 def main():
     parser = argparse.ArgumentParser(description="Chock: Programmable Data Plane Toolchain in P4_16")
     subparsers = parser.add_subparsers(dest="subcommand", help="Subcommand to execute")
     
     p_check = subparsers.add_parser("check", help="Verify syntax and types of all P4 programs")
+    p_test = subparsers.add_parser("test", help="Run full test suite")
     
     p_sim = subparsers.add_parser("sim", help="Simulate a packet through the data plane")
     p_sim.add_argument("--port", type=int, default=1, help="Ingress port ID")
@@ -124,6 +138,8 @@ def main():
     args = parser.parse_args()
     if args.subcommand == "check":
         cmd_check(args)
+    elif args.subcommand == "test":
+        cmd_test(args)
     elif args.subcommand == "sim":
         cmd_sim(args)
     elif args.subcommand == "bench":
